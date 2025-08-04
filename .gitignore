@@ -370,24 +370,14 @@ maven-metadata-local.xml
 # Visual Studio Code editor settings and workspace files
 
 # Visual Studio Code
-.vscode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-
-!.vscode/extensions.json
-!.vscode/*.code-snippets
-.history/
+.vscode/
 *.vsix
 .ionide
-
 .vs/
 *.code-workspace
 .vscode-test
 .vscodeignore
 .vscode/chrome
-
 .vscode-server/
 .vscode/sftp.json
 .vscode/tags
