@@ -1,0 +1,387 @@
+# ========== EUREKA SERVER ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      containers:
+        - name: eureka-server
+          image: josue122121/eureka-server:latest
+          ports:
+            - containerPort: 8761
+          env:
+            - name: SERVER_PORT
+              value: "8761"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "false"
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "false"
+            - name: EUREKA_SERVER_ENABLE_SELF_PRESERVATION
+              value: "false"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== AUTH SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authservice
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authservice
+  template:
+    metadata:
+      labels:
+        app: authservice
+    spec:
+      containers:
+        - name: authservice
+          image: josue122121/authservice:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-AUTENTICACION"
+            - name: SERVER_PORT
+              value: "8081"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-auth:5432/authservice_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: JWT_SECRET
+              value: u6rckmOPVwT9OuoWZf9lZtabfM6TTRGTYiS6OQ4Nkb8=
+            - name: JWT_EXPIRATIONMS
+              value: "3600000"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== API GATEWAY ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: josue122121/api-gateway:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "API-GATEWAY"
+            - name: SERVER_PORT
+              value: "8000"
+            - name: SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID
+              value: "true"
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: JWT_SECRET
+              value: u6rckmOPVwT9OuoWZf9lZtabfM6TTRGTYiS6OQ4Nkb8=
+            - name: JWT_EXPIRATIONMS
+              value: "3600000"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== PUBLICACIONES SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-publicaciones
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-publicaciones
+  template:
+    metadata:
+      labels:
+        app: ms-publicaciones
+    spec:
+      containers:
+        - name: ms-publicaciones
+          image: josue122121/ms-publicaciones:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-PUBLICACIONES"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-publicaciones:5432/db-publicaciones
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== CATALOGO SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-catalogo
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-catalogo
+  template:
+    metadata:
+      labels:
+        app: ms-catalogo
+    spec:
+      containers:
+        - name: ms-catalogo
+          image: josue122121/ms-catalogo:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-CATALOGO"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-catalogo:5432/db-catalogo
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== NOTIFICACIONES SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-notificaciones
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-notificaciones
+  template:
+    metadata:
+      labels:
+        app: ms-notificaciones
+    spec:
+      containers:
+        - name: ms-notificaciones
+          image: josue122121/ms-notificaciones:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-NOTIFICACIONES"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-notificaciones:5432/db-notificaciones
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+# ========== SINCRONIZACION SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sincronizacion
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sincronizacion
+  template:
+    metadata:
+      labels:
+        app: sincronizacion
+    spec:
+      containers:
+        - name: sincronizacion
+          image: josue122121/sincronizacion:latest
+          ports:
+            - containerPort: 8083
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-SINCRONIZACION"
+            - name: SERVER_PORT
+              value: "8083"
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: RELOJ_INTERVALO
+              value: "10"
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 100m
+            limits:
+              memory: 400Mi
+              cpu: 300m

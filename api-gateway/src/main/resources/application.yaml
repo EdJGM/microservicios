@@ -1,0 +1,73 @@
+server:
+    port: 8000
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: authservice
+              uri: lb://SERVICIO-AUTENTICACION
+              predicates:
+                - Path=/api/v1/api/auth/**
+              filters:
+                - StripPrefix=2
+            - id: ms-publicaciones-autor
+              uri: lb://SERVICIO-PUBLICACIONES
+              predicates:
+                - Path=/api/v1/publicaciones/autor/**
+              filters:
+                - StripPrefix=2
+            - id: ms-publicaciones-articulo
+              uri: lb://SERVICIO-PUBLICACIONES
+              predicates:
+                - Path=/api/v1/publicaciones/articulo/**
+              filters:
+                - StripPrefix=2
+            - id: ms-publicaciones-libro
+              uri: lb://SERVICIO-PUBLICACIONES
+              predicates:
+                - Path=/api/v1/publicaciones/libro/**
+              filters:
+                - StripPrefix=2
+            - id: ms-catalogo
+              uri: lb://SERVICIO-CATALOGO
+              predicates:
+                - Path=/api/v1/catalogo/**
+              filters:
+                - StripPrefix=2
+            - id: ms-notificaciones
+              uri: lb://SERVICIO-NOTIFICACIONES
+              predicates:
+                - Path=/api/v1/notificaciones/**
+              filters:
+                - StripPrefix=2
+
+jwt:
+  secret: u6rckmOPVwT9OuoWZf9lZtabfM6TTRGTYiS6OQ4Nkb8= # ej. generado con `openssl rand -base64 32`
+  expirationMs: 3600000 # 1 hora en ms
+
+eureka:
+    client:
+      serviceUrl:
+        defaultZone: http://localhost:8761/eureka/
+      fetch-registry: true
+      register-with-eureka: true
+    instance:
+        prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

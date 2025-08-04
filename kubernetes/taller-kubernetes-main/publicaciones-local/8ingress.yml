@@ -1,0 +1,76 @@
+# ========== INGRESS - EXPOSICION EXTERNA ==========
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: publicaciones-ingress
+  namespace: publicaciones-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    # Configuraciones adicionales para microservicios
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app-publicaciones.local
+      http:
+        paths:
+          # Ruta principal - API Gateway maneja todo el routing
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+---
+# ========== INGRESS ADICIONAL PARA DEBUGGING (OPCIONAL) ==========
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: publicaciones-debug-ingress
+  namespace: publicaciones-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    # Acceso directo a Eureka Dashboard
+    - host: eureka.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eureka-server
+                port:
+                  number: 8761
+
+    # Acceso directo a RabbitMQ Management
+    - host: rabbitmq.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabbitmq
+                port:
+                  number: 15672
+
+    # Acceso directo al API Gateway (para debugging)
+    - host: gateway.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000

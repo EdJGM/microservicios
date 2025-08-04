@@ -1,0 +1,793 @@
+# DEPLOYMENT CORREGIDO - EUREKA Y RUTAS FUNCIONANDO
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: publicaciones
+---
+# ========== POSTGRES AUTH ==========
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-auth-pvc
+  namespace: publicaciones
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-auth
+  namespace: publicaciones
+spec:
+  selector:
+    matchLabels:
+      app: postgres-auth
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-auth
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: authservice_db
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: Edgar123456/
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "150m"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: postgres-auth-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-auth
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-auth
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# ========== POSTGRES PUBLICACIONES ==========
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-publicaciones-pvc
+  namespace: publicaciones
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-publicaciones
+  namespace: publicaciones
+spec:
+  selector:
+    matchLabels:
+      app: postgres-publicaciones
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-publicaciones
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: db-publicaciones
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: Edgar123456/
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "150m"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: postgres-publicaciones-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-publicaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-publicaciones
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# ========== POSTGRES CATALOGO ==========
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-catalogo-pvc
+  namespace: publicaciones
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-catalogo
+  namespace: publicaciones
+spec:
+  selector:
+    matchLabels:
+      app: postgres-catalogo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-catalogo
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: db-catalogo
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: Edgar123456/
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "150m"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: postgres-catalogo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-catalogo
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-catalogo
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# ========== POSTGRES NOTIFICACIONES ==========
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-notificaciones-pvc
+  namespace: publicaciones
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-notificaciones
+  namespace: publicaciones
+spec:
+  selector:
+    matchLabels:
+      app: postgres-notificaciones
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-notificaciones
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: db-notificaciones
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: Edgar123456/
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "150m"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: postgres-notificaciones-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-notificaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-notificaciones
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# ========== RABBITMQ ==========
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pvc
+  namespace: publicaciones
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 300Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: publicaciones
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.9-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: admin
+            - name: RABBITMQ_DEFAULT_PASS
+              value: admin
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/rabbitmq
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "200m"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: publicaciones
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - port: 5672
+      targetPort: 5672
+      name: amqp
+    - port: 15672
+      targetPort: 15672
+      name: management
+      nodePort: 31672
+  type: NodePort
+---
+# ========== EUREKA SERVER ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+        - name: eureka
+          image: josue122121/eureka-server:latest
+          ports:
+            - containerPort: 8761
+          env:
+            - name: SERVER_PORT
+              value: "8761"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "false"
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "false"
+            - name: EUREKA_SERVER_ENABLE_SELF_PRESERVATION
+              value: "false"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka
+  namespace: publicaciones
+spec:
+  selector:
+    app: eureka
+  ports:
+    - port: 8761
+      targetPort: 8761
+      nodePort: 30761
+  type: NodePort
+---
+# ========== AUTH SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: josue122121/authservice:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-AUTENTICACION"
+            - name: SERVER_PORT
+              value: "8081"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-auth:5432/authservice_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: JWT_SECRET
+              value: u6rckmOPVwT9OuoWZf9lZtabfM6TTRGTYiS6OQ4Nkb8=
+            - name: JWT_EXPIRATIONMS
+              value: "3600000"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: publicaciones
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - port: 8081
+      targetPort: 8081
+---
+# ========== API GATEWAY ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: josue122121/api-gateway:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "API-GATEWAY"
+            - name: SERVER_PORT
+              value: "8000"
+            - name: SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID
+              value: "true"
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: JWT_SECRET
+              value: u6rckmOPVwT9OuoWZf9lZtabfM6TTRGTYiS6OQ4Nkb8=
+            - name: JWT_EXPIRATIONMS
+              value: "3600000"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: publicaciones
+spec:
+  selector:
+    app: api-gateway
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# ========== PUBLICACIONES SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publicaciones-service
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: publicaciones-service
+  template:
+    metadata:
+      labels:
+        app: publicaciones-service
+    spec:
+      containers:
+        - name: publicaciones-service
+          image: josue122121/ms-publicaciones:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-PUBLICACIONES"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-publicaciones:5432/db-publicaciones
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: publicaciones-service
+  namespace: publicaciones
+spec:
+  selector:
+    app: publicaciones-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+# ========== CATALOGO SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogo-service
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalogo-service
+  template:
+    metadata:
+      labels:
+        app: catalogo-service
+    spec:
+      containers:
+        - name: catalogo-service
+          image: josue122121/ms-catalogo:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-CATALOGO"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-catalogo:5432/db-catalogo
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogo-service
+  namespace: publicaciones
+spec:
+  selector:
+    app: catalogo-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+# ========== NOTIFICACIONES SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificaciones-service
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificaciones-service
+  template:
+    metadata:
+      labels:
+        app: notificaciones-service
+    spec:
+      containers:
+        - name: notificaciones-service
+          image: josue122121/ms-notificaciones:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-NOTIFICACIONES"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-notificaciones:5432/db-notificaciones
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Edgar123456/
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+          resources:
+            limits:
+              memory: "400Mi"
+              cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificaciones-service
+  namespace: publicaciones
+spec:
+  selector:
+    app: notificaciones-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+# ========== SINCRONIZACION SERVICE ==========
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sincronizacion-service
+  namespace: publicaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sincronizacion-service
+  template:
+    metadata:
+      labels:
+        app: sincronizacion-service
+    spec:
+      containers:
+        - name: sincronizacion-service
+          image: josue122121/sincronizacion:latest
+          ports:
+            - containerPort: 8083
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "SERVICIO-SINCRONIZACION"
+            - name: SERVER_PORT
+              value: "8083"
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: admin
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: admin
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka:8761/eureka/
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+            - name: RELOJ_INTERVALO
+              value: "10"
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sincronizacion-service
+  namespace: publicaciones
+spec:
+  selector:
+    app: sincronizacion-service
+  ports:
+    - port: 8083
+      targetPort: 8083
+---
+# ========== INGRESS ==========
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: publicaciones-ingress
+  namespace: publicaciones
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app-publicaciones.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000

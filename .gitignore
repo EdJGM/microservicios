@@ -130,8 +130,6 @@ healthchecksdb
 # Kubernetes configuration and deployment files
 
 # Kubernetes configuration files
-*.yaml
-*.yml
 kubeconfig
 .kube/
 
@@ -372,6 +370,7 @@ maven-metadata-local.xml
 # Visual Studio Code editor settings and workspace files
 
 # Visual Studio Code
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

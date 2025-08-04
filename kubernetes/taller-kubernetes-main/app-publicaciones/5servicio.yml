@@ -1,0 +1,172 @@
+# ========== SERVICES PARA POSTGRES (SEPARADOS) ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-auth
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-auth
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-publicaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-publicaciones
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-catalogo
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-catalogo
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-notificaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: postgres-notificaciones
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+# ========== RABBITMQ SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: publicaciones
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: management
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+      nodePort: 31672
+  type: NodePort
+---
+# ========== EUREKA SERVER SERVICE (CORRIGIENDO NODEPORT) ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server
+  namespace: publicaciones
+spec:
+  selector:
+    app: eureka-server
+  ports:
+    - port: 8761
+      targetPort: 8761
+      nodePort: 30761
+  type: NodePort
+---
+# ========== API GATEWAY SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: publicaciones
+spec:
+  selector:
+    app: api-gateway
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
+---
+# ========== AUTH SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: authservice
+  namespace: publicaciones
+spec:
+  selector:
+    app: authservice
+  ports:
+    - port: 8081
+      targetPort: 8081
+  type: ClusterIP
+---
+# ========== PUBLICACIONES SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-publicaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: ms-publicaciones
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# ========== CATALOGO SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-catalogo
+  namespace: publicaciones
+spec:
+  selector:
+    app: ms-catalogo
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# ========== NOTIFICACIONES SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-notificaciones
+  namespace: publicaciones
+spec:
+  selector:
+    app: ms-notificaciones
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# ========== SINCRONIZACION SERVICE ==========
+apiVersion: v1
+kind: Service
+metadata:
+  name: sincronizacion
+  namespace: publicaciones
+spec:
+  selector:
+    app: sincronizacion
+  ports:
+    - port: 8083
+      targetPort: 8083
+  type: ClusterIP
