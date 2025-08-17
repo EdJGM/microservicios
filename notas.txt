@@ -24,42 +24,5 @@ POST /auth/revokeToken
 { "username": "user@example.com" }
 
 
-Resumen de puertos por microservicio:
-ms-publicaciones: 8080
-ms-notificaciones: 8082
-ms-catalogo: 8083
-sincronizacion: 8084
-authservice: 8081
-api-gateway: 8000
-eureka-server: 8761
 
-
-mvn clean package -DskipTests
-
-docker build -t josue122121/eureka-server:latest .
-docker build -t josue122121/api-gateway:latest .
-docker build -t josue122121/authservice:latest .
-docker build -t josue122121/ms-publicaciones:latest .
-docker build -t josue122121/ms-notificaciones:latest .
-docker build -t josue122121/ms-catalogo:latest .
-docker build -t josue122121/sincronizacion:latest .
-
-docker push josue122121/eureka-server:latest
-docker push josue122121/api-gateway:latest
-docker push josue122121/authservice:latest
-docker push josue122121/ms-publicaciones:latest
-docker push josue122121/ms-notificaciones:latest
-docker push josue122121/ms-catalogo:latest
-docker push josue122121/sincronizacion:latest
-
-minikube delete --all
-minikube start
-minikube addons enable ingress
-minikube dashboard
-
-kubectl get pods -n publicaciones
-kubectl get svc -n publicaciones
-kubectl get ingress -n publicaciones
-kubectl port-forward service/eureka-server 8761:8761 -n publicaciones
-
-minikube tunnel
+1089365240247746561

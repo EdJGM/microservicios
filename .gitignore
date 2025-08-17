@@ -370,7 +370,18 @@ maven-metadata-local.xml
 # Visual Studio Code editor settings and workspace files
 
 # Visual Studio Code
+.vscode/*
 .vscode/
+.vscode-test/
+.vscode-server/
+.vscode-chrome/
+.vscode-server-insiders/
+.vscode-insiders/
+.vscode-oss/
+.vscode-oss-dev/
+.vscode-oss-dev-insiders/
+.vscode-oss-dev-server/
+.vscode-oss-dev-server-insiders/  
 *.vsix
 .ionide
 .vs/
